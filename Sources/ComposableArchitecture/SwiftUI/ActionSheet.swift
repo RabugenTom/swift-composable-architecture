@@ -82,20 +82,22 @@ import SwiftUI
 ///       environment: .mock
 ///     )
 ///
-///     store.send(.infoTapped) {
-///       $0.actionSheet = .init(
-///         title: "What would you like to do?",
-///         buttons: [
-///           .default(TextState("Favorite"), send: .favoriteTapped),
-///           .destructive(TextState("Delete"), send: .deleteTapped),
-///           .cancel(),
-///         ]
-///       )
-///     }
-///     store.send(.favoriteTapped) {
-///       $0.actionSheet = nil
-///       // Also verify that favoriting logic executed correctly
-///     }
+///     store.assert(
+///       .send(.infoTapped) {
+///         $0.actionSheet = .init(
+///           title: "What would you like to do?",
+///           buttons: [
+///             .default(TextState("Favorite"), send: .favoriteTapped),
+///             .destructive(TextState("Delete"), send: .deleteTapped),
+///             .cancel(),
+///           ]
+///         )
+///       },
+///       .send(.favoriteTapped) {
+///         $0.actionSheet = nil
+///         // Also verify that favoriting logic executed correctly
+///       }
+///     )
 ///
 @available(iOS 13, *)
 @available(macCatalyst 13, *)

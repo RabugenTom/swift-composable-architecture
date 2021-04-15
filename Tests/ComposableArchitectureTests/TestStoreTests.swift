@@ -45,18 +45,22 @@ class TestStoreTests: XCTestCase {
       environment: testScheduler.eraseToAnyScheduler()
     )
 
-    store.send(.a)
+    store.assert(
+      .send(.a),
 
-    testScheduler.advance(by: 1)
+      .do { testScheduler.advance(by: 1) },
 
-    store.receive(.b1)
-    store.receive(.b2)
-    store.receive(.b3)
+      .receive(.b1),
+      .receive(.b2),
+      .receive(.b3),
 
-    store.receive(.c1)
-    store.receive(.c2)
-    store.receive(.c3)
+      .sequence([
+        .receive(.c1),
+        .receive(.c2),
+        .receive(.c3),
+      ]),
 
-    store.send(.d)
+      .send(.d)
+    )
   }
 }

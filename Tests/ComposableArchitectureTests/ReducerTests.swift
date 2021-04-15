@@ -47,16 +47,18 @@ final class ReducerTests: XCTestCase {
       environment: scheduler.eraseToAnyScheduler()
     )
 
-    store.send(.increment) {
-      $0 = 2
-    }
-    // Waiting a second causes the fast effect to fire.
-    scheduler.advance(by: 1)
-    XCTAssertEqual(fastValue, 42)
-    // Waiting one more second causes the slow effect to fire. This proves that the effects
-    // are merged together, as opposed to concatenated.
-    scheduler.advance(by: 1)
-    XCTAssertEqual(slowValue, 1729)
+    store.assert(
+      .send(.increment) {
+        $0 = 2
+      },
+      // Waiting a second causes the fast effect to fire.
+      .do { scheduler.advance(by: 1) },
+      .do { XCTAssertEqual(fastValue, 42) },
+      // Waiting one more second causes the slow effect to fire. This proves that the effects
+      // are merged together, as opposed to concatenated.
+      .do { scheduler.advance(by: 1) },
+      .do { XCTAssertEqual(slowValue, 1729) }
+    )
   }
 
   func testCombine() {
@@ -85,9 +87,11 @@ final class ReducerTests: XCTestCase {
       environment: ()
     )
 
-    store.send(.increment) {
-      $0 = 2
-    }
+    store.assert(
+      .send(.increment) {
+        $0 = 2
+      }
+    )
 
     XCTAssertTrue(childEffectExecuted)
     XCTAssertTrue(mainEffectExecuted)
@@ -124,8 +128,10 @@ final class ReducerTests: XCTestCase {
       reducer: reducer,
       environment: ()
     )
-    store.send(.incr) { $0.count = 1 }
-    store.send(.noop)
+    store.assert(
+      .send(.incr) { $0.count = 1 },
+      .send(.noop)
+    )
 
     self.wait(for: [logsExpectation], timeout: 2)
 

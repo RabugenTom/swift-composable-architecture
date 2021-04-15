@@ -375,15 +375,17 @@ final class StoreTests: XCTestCase {
       environment: ()
     )
 
-    store.send(.`init`)
-    store.send(.incrementTapped)
-    store.receive(.doIncrement) {
-      $0 = 1
-    }
-    store.send(.incrementTapped)
-    store.receive(.doIncrement) {
-      $0 = 2
-    }
-    subject.send(completion: .finished)
+    store.assert(
+      .send(.`init`),
+      .send(.incrementTapped),
+      .receive(.doIncrement) {
+        $0 = 1
+      },
+      .send(.incrementTapped),
+      .receive(.doIncrement) {
+        $0 = 2
+      },
+      .do { subject.send(completion: .finished) }
+    )
   }
 }
